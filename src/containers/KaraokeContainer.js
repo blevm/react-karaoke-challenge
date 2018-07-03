@@ -41,8 +41,22 @@ class KaraokeContainer extends Component {
 
     console.log(newState)
 
-
     fetch(`https://demo.lovescomputers.com/users/13/songs/${id}/like`, {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'}
+    }).then(this.setState({songList: newState}));
+  }
+
+  handleDislike = (id) => {
+    let newState = this.state.songList.map(song => {
+      if (song.id === id) {
+        song.dislikes++
+      }
+    })
+
+    console.log(newState)
+
+    fetch(`https://demo.lovescomputers.com/users/13/songs/${id}/dislike`, {
         method: 'PATCH',
         headers: {'Content-Type': 'application/json'}
     }).then(this.setState({songList: newState}));
@@ -68,7 +82,7 @@ class KaraokeContainer extends Component {
           <SongList songs={(this.state.filteredSongs !== null)? this.state.filteredSongs : this.state.songList} handlePlay={this.handlePlay}/>
         </div>
         <KaraokeDisplay selectedSong={this.state.selectedSong}
-          handleLike={this.handleLike}/>
+          handleLike={this.handleLike} handleDislike={this.handleDislike}/>
       </div>
     );
   }
