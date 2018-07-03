@@ -32,13 +32,20 @@ class KaraokeContainer extends Component {
     }
   }
 
-  handleLike = (selectedSong) => {
-    ++selectedSong.likes
-    
-    fetch(`https://demo.lovescomputers.com/users/13/songs/${selectedSong.id}/like`, {
+  handleLike = (id) => {
+    let newState = this.state.songList.map(song => {
+      if (song.id === id) {
+        song.likes++
+      }
+    })
+
+    console.log(newState)
+
+
+    fetch(`https://demo.lovescomputers.com/users/13/songs/${id}/like`, {
         method: 'PATCH',
         headers: {'Content-Type': 'application/json'}
-    });
+    }).then(this.setState({songList: newState}));
   }
 
 
