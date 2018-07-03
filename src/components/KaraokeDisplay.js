@@ -1,11 +1,15 @@
 import React from 'react';
 import Lyrics from './Lyrics';
 
-const KaraokeDisplay = () => {
+const KaraokeDisplay = (props) => {
   return (
     <div className="karaoke-display">
-      <h2>Song Title</h2>
-      <Lyrics lyrics="example song lyrics" />
+      {(props.selectedSong !== null) ? <div>
+          <button onClick={() => props.handleLike(props.selectedSong)}>Like</button>
+          <button>Dislike</button>
+        </div> : undefined}
+      <h2>{(props.selectedSong !== null)? props.selectedSong.title : "Select a song!"}</h2>
+      <Lyrics lyrics={(props.selectedSong !== null)? props.selectedSong.lyrics : undefined} />
     </div>
   )
 }

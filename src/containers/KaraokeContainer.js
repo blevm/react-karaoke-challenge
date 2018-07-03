@@ -5,14 +5,63 @@ import KaraokeDisplay from '../components/KaraokeDisplay';
 import songs from '../data/songs';
 
 class KaraokeContainer extends Component {
+
+  state = {
+    songList: [],
+    selectedSong: null,
+    searchTerm: '',
+    filteredSongs: null
+  }
+
+  componentDidMount() {
+    fetch(`https://demo.lovescomputers.com/users/13/songs`).then(resp => resp.json()).then(data => this.setState({songList: data}))
+  }
+
+  handlePlay = (id) => {
+    let selectedSong = this.state.songList.find(song => song.id === id)
+
+    if (selectedSong !== this.state.selectedSong) {
+      selectedSong.plays++
+
+      fetch('https://demo.lovescomputers.com/users/13/songs/' + id + '/play', {
+          method: 'PATCH',
+          headers: {'Content-Type': 'application/json'}
+      }).then(res => {
+          res.json();
+      }).then(this.setState({selectedSong}));
+    }
+  }
+
+  handleLike = (selectedSong) => {
+    ++selectedSong.likes
+    
+    fetch(`https://demo.lovescomputers.com/users/13/songs/${selectedSong.id}/like`, {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'}
+    });
+  }
+
+
+  setSearchTerm = (event) => {
+    this.setState({searchTerm: event.target.value}, () => this.handleLiveSearch())
+  }
+
+  handleLiveSearch = () => {
+    let filteredSongs = this.state.songList.filter(song => song.title.toLowerCase().includes(this.state.searchTerm.toLowerCase()))
+
+    this.setState({filteredSongs})
+  }
+
   render() {
+    console.log(`in render`, this.state.filteredSongs)
     return (
       <div className="karaoke-container">
         <div className="sidebar">
-          <Filter />
-          <SongList />
+          <Filter setSearchTerm={this.setSearchTerm} searchTerm={this.state.searchTerm} />
+          <SongList songs={(this.state.filteredSongs !== null)? this.state.filteredSongs : this.state.songList} handlePlay={this.handlePlay}/>
         </div>
-        <KaraokeDisplay />
+        <KaraokeDisplay selectedSong={this.state.selectedSong}
+          handleLike={this.handleLike}/>
       </div>
     );
   }
