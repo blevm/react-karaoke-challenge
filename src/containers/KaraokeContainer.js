@@ -14,21 +14,28 @@ class KaraokeContainer extends Component {
   }
 
   componentDidMount() {
-    fetch(`https://demo.lovescomputers.com/users/13/songs`).then(resp => resp.json()).then(data => this.setState({songList: data}))
+    fetch(`http://localhost:4000/users/13/songs`).then(resp => resp.json()).then(data => this.setState({songList: data}))
   }
 
   handlePlay = (id) => {
     let selectedSong = this.state.songList.find(song => song.id === id)
 
     if (selectedSong !== this.state.selectedSong) {
-      selectedSong.plays++
+      let newState = this.state.songList.map(song => {
+        if (song.id === id) {
+          song.plays++
+          return song
+        } else {
+          return song
+        }
+      })
 
-      fetch('https://demo.lovescomputers.com/users/13/songs/' + id + '/play', {
+      fetch('http://localhost:4000/users/13/songs/' + id + '/play', {
           method: 'PATCH',
           headers: {'Content-Type': 'application/json'}
       }).then(res => {
           res.json();
-      }).then(this.setState({selectedSong}));
+      }).then(this.setState({selectedSong, songList: newState}));
     }
   }
 
@@ -36,12 +43,15 @@ class KaraokeContainer extends Component {
     let newState = this.state.songList.map(song => {
       if (song.id === id) {
         song.likes++
+        return song
+      } else {
+        return song
       }
     })
 
     console.log(newState)
 
-    fetch(`https://demo.lovescomputers.com/users/13/songs/${id}/like`, {
+    fetch(`http://localhost:4000/users/13/songs/${id}/like`, {
         method: 'PATCH',
         headers: {'Content-Type': 'application/json'}
     }).then(this.setState({songList: newState}));
@@ -51,17 +61,19 @@ class KaraokeContainer extends Component {
     let newState = this.state.songList.map(song => {
       if (song.id === id) {
         song.dislikes++
+        return song
+      } else {
+        return song
       }
     })
 
     console.log(newState)
 
-    fetch(`https://demo.lovescomputers.com/users/13/songs/${id}/dislike`, {
+    fetch(`http://localhost:4000/users/13/songs/${id}/dislike`, {
         method: 'PATCH',
         headers: {'Content-Type': 'application/json'}
     }).then(this.setState({songList: newState}));
   }
-
 
   setSearchTerm = (event) => {
     this.setState({searchTerm: event.target.value}, () => this.handleLiveSearch())
